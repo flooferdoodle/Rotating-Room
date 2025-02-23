@@ -102,7 +102,7 @@ Material:
     - _AlphaClip: 0
     - _AlphaToMask: 0
     - _Blend: 0
-    - _BlendAmount: 5
+    - _BlendAmount: 0.1
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
     - _ClearCoatMask: 0
@@ -117,9 +117,9 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _MaxAngle: 222.59317
+    - _MaxAngle: 120
     - _Metallic: 0
-    - _MinAngle: 102.59317
+    - _MinAngle: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueControl: 0
