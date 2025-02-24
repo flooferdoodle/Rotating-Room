@@ -2,15 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public class PickUp : MonoBehaviour
 {
     public GameObject currentPickup;
+    public Transform player; // Reference to the player
 
-    // Called when another collider enters the trigger attached to this object.
     private void OnTriggerEnter(Collider other)
     {
-        // Check if the colliding object is tagged as "Pickup".
         if (other.CompareTag("Pickup"))
         {
             currentPickup = other.gameObject;
@@ -18,10 +16,8 @@ public class PickUp : MonoBehaviour
         }
     }
 
-    // Called when another collider exits the trigger attached to this object.
     private void OnTriggerExit(Collider other)
     {
-        // Clear the reference if the object leaving is the current pickup.
         if (other.gameObject == currentPickup)
         {
             Debug.Log("Left pickup zone: " + currentPickup.name);
@@ -29,16 +25,39 @@ public class PickUp : MonoBehaviour
         }
     }
 
-    // Update is called once per frame.
     private void Update()
     {
-        // Check if the "E" key is pressed and a pickup is available.
         if (Input.GetKeyDown(KeyCode.E) && currentPickup != null)
         {
             Debug.Log("Picked up: " + currentPickup.name);
-            // Simulate pickup by destroying the object.
+            GenerateHeldObject(currentPickup);
             Destroy(currentPickup);
             currentPickup = null;
         }
+    }
+
+    void GenerateHeldObject(GameObject original)
+    {
+        // Get unique offset and scale from PickupProperties
+        PickupProperties properties = original.GetComponent<PickupProperties>();
+        Vector3 pickupOffset = properties != null ? properties.pickupOffset : Vector3.zero;
+        Vector3 pickupScale = properties != null ? properties.pickupScale : Vector3.one;
+
+        // Instantiate new object at player's position + unique offset
+        GameObject heldObject = Instantiate(original, player.position + pickupOffset, Quaternion.identity);
+
+        // Remove unnecessary components
+        if (heldObject.GetComponent<Rigidbody>())
+            Destroy(heldObject.GetComponent<Rigidbody>());
+        if (heldObject.GetComponent<Collider>())
+            Destroy(heldObject.GetComponent<Collider>());
+
+        // Apply unique scaling
+        heldObject.transform.localScale = pickupScale;
+
+        // Set as a child of the player
+        heldObject.transform.SetParent(player);
+
+        Debug.Log("Generated held object: " + heldObject.name);
     }
 }
