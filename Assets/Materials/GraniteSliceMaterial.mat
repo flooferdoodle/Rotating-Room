@@ -117,9 +117,9 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _MaxAngle: 240
+    - _MaxAngle: 0
     - _Metallic: 0
-    - _MinAngle: 120
+    - _MinAngle: 180
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueControl: 0
