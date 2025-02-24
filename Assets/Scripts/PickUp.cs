@@ -43,10 +43,8 @@ public class PickUp : MonoBehaviour
         Vector3 pickupOffset = properties != null ? properties.pickupOffset : Vector3.zero;
         Vector3 pickupScale = properties != null ? properties.pickupScale : Vector3.one;
 
-        // Instantiate new object at player's position + unique offset
-        GameObject heldObject = Instantiate(original, player);
-        heldObject.transform.position = player.position; // Set correct local position
-        //heldObject.transform.localScale = pickupScale;
+        // Instantiate new object (NOT parented yet!)
+        GameObject heldObject = Instantiate(original);
 
         // Remove unnecessary components
         if (heldObject.GetComponent<Rigidbody>())
@@ -54,11 +52,19 @@ public class PickUp : MonoBehaviour
         if (heldObject.GetComponent<Collider>())
             Destroy(heldObject.GetComponent<Collider>());
 
+        // Set correct world position before parenting
+        heldObject.transform.position = player.position;
 
-        // Set as a child of the player
+        // Apply correct scale BEFORE parenting
+        heldObject.transform.localScale = pickupScale;
+
+        // Set as a child of the player AFTER setting scale & position
         heldObject.transform.SetParent(player);
+
+        // Now apply correct local position relative to the player
         heldObject.transform.localPosition = pickupOffset;
 
         Debug.Log("Generated held object: " + heldObject.name);
     }
+
 }
