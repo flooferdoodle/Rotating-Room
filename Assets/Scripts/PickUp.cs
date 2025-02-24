@@ -44,7 +44,9 @@ public class PickUp : MonoBehaviour
         Vector3 pickupScale = properties != null ? properties.pickupScale : Vector3.one;
 
         // Instantiate new object at player's position + unique offset
-        GameObject heldObject = Instantiate(original, player.position + pickupOffset, Quaternion.identity);
+        GameObject heldObject = Instantiate(original, player);
+        heldObject.transform.position = player.position; // Set correct local position
+        //heldObject.transform.localScale = pickupScale;
 
         // Remove unnecessary components
         if (heldObject.GetComponent<Rigidbody>())
@@ -52,11 +54,10 @@ public class PickUp : MonoBehaviour
         if (heldObject.GetComponent<Collider>())
             Destroy(heldObject.GetComponent<Collider>());
 
-        // Apply unique scaling
-        heldObject.transform.localScale = pickupScale;
 
         // Set as a child of the player
         heldObject.transform.SetParent(player);
+        heldObject.transform.localPosition = pickupOffset;
 
         Debug.Log("Generated held object: " + heldObject.name);
     }
