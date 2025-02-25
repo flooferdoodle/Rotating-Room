@@ -27,6 +27,16 @@ public class SplitHandlerSingleton : MonoBehaviour
 
     public Transform roomParents;
 
+    public struct RoomMaterialData {
+        // Underlying texture data for swapping
+        Texture wallTex;
+        Texture floorTex;
+        // Shadergraph which is basis of all objects, for changing angle offsets to handle transparency
+        Shader objectShaderBase; 
+    }
+
+    public List<RoomMaterialData> roomsMaterialData;
+
     // Start is called before the first frame update
     void Start()
     {
