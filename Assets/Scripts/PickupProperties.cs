@@ -7,6 +7,7 @@ public class PickupProperties : MonoBehaviour
     
     public Vector3 pickupOffset = new Vector3(18.6f, 9.3f, 3.3f); // Default offset
     public Vector3 pickupScale = new Vector3(0.5f, 0.5f, 0.5f); // Default scale
+    public float colTriggerScale = 1.2f;
 
     void Start()
     {
