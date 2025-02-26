@@ -9,6 +9,8 @@ public class PickUp : MonoBehaviour
     public GameObject heldObject;
     //what are you currently colliding with
     public GameObject currentPickup;
+    public GameObject currentInteractable;
+    public GameObject thisPlayer;
 
     public Transform player;
     public bool isHolding;
@@ -24,15 +26,21 @@ public class PickUp : MonoBehaviour
             currentPickup = other.transform.parent.gameObject;
             Debug.Log("Entered pickup zone: " + currentPickup.name);
         }
+
+        if (other.CompareTag("Interactable"))
+        {
+            currentInteractable = other.transform.parent.gameObject;
+            Debug.Log("Entered interact zone: " + currentInteractable.name);
+        }
     }
 
     //throws debug & updates current pickup
     private void OnTriggerExit(Collider other)
     {
-        if (other.transform.parent!=null && other.transform.parent == currentPickup)
+        if (other.transform.parent != null)
         {
-            Debug.Log("Left pickup zone: " + currentPickup.name);
-            currentPickup = null;
+            if (other.transform.parent.gameObject == currentPickup) currentPickup = null;
+            if (other.transform.parent.gameObject == currentInteractable) currentInteractable = null;
         }
     }
 
@@ -52,6 +60,8 @@ public class PickUp : MonoBehaviour
         {
             dialScript = GetComponent<isUsingDial>();
         }
+
+        thisPlayer = gameObject;
         
     }
 
@@ -78,6 +88,12 @@ public class PickUp : MonoBehaviour
         if (dialScript.dialUse)
         {
             DropHeldObject();
+        }
+
+        if (Input.GetKeyDown(KeyCode.E) && currentInteractable != null && !dialScript.dialUse)
+        {
+            Interactable thisInteractable = currentInteractable.GetComponent<Interactable>();
+            thisInteractable.Interact(thisPlayer);
         }
     }
 
