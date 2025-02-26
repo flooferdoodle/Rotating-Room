@@ -1039,6 +1039,7 @@ GameObject:
   m_Component:
   - component: {fileID: 396732970}
   - component: {fileID: 396732971}
+  - component: {fileID: 396732972}
   m_Layer: 0
   m_Name: Sprite
   m_TagString: Untagged
@@ -1113,6 +1114,27 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!65 &396732972
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 396732969}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.26, y: 1.0499997, z: 0.20000005}
+  m_Center: {x: 0, y: 0, z: 0.000000059604645}
 --- !u!1 &449185429
 GameObject:
   m_ObjectHideFlags: 0
@@ -2101,6 +2123,7 @@ GameObject:
   - component: {fileID: 1368803295}
   - component: {fileID: 1368803294}
   - component: {fileID: 1368803293}
+  - component: {fileID: 1368803299}
   m_Layer: 0
   m_Name: mainMan
   m_TagString: Untagged
@@ -2170,6 +2193,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2250c61dc273741ce9b9ea64a3b0d463, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  heldObject: {fileID: 0}
   currentPickup: {fileID: 0}
   player: {fileID: 1368803298}
 --- !u!114 &1368803296
@@ -2252,6 +2276,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 45, z: 0}
+--- !u!114 &1368803299
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1368803292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07b8e33d363de4ad79122a92cfc3f9f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dialUse: 0
 --- !u!1 &1397150987
 GameObject:
   m_ObjectHideFlags: 0

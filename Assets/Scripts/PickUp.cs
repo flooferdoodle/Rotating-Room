@@ -4,14 +4,19 @@ using UnityEngine;
 
 public class PickUp : MonoBehaviour
 {
+
+    //what are you currently holding
     public GameObject heldObject;
+    //what are you currently colliding with
     public GameObject currentPickup;
-    public Transform player; // Reference to the player
+
+    public Transform player;
+    public bool isHolding;
+
+    //boolean for testing -- are you using the dial
     private isUsingDial dialScript;
 
-    //Stored components of held objects
-
-
+    //throws debug messages & updates currentPickup
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Pickup"))
@@ -21,6 +26,7 @@ public class PickUp : MonoBehaviour
         }
     }
 
+    //throws debug & updates current pickup
     private void OnTriggerExit(Collider other)
     {
         if (other.gameObject == currentPickup)
@@ -30,8 +36,18 @@ public class PickUp : MonoBehaviour
         }
     }
 
+    //initialize script that you get dial bool from
+
     private void Start()
     {
+        if(heldObject != null)
+        {
+            isHolding = true;
+        }
+        else
+        {
+            isHolding = false;
+        }
         if(GetComponent<isUsingDial>() != null)
         {
             dialScript = GetComponent<isUsingDial>();
@@ -41,12 +57,17 @@ public class PickUp : MonoBehaviour
 
     private void Update()
     {
+        //if user interacts check if in interact zone and if using dial
         if (Input.GetKeyDown(KeyCode.E) && currentPickup != null && !dialScript.dialUse)
         {
-            if (heldObject != null)
+            // Drop the currently held object
+            if (isHolding)
             {
-                DropHeldObject(); // Drop the currently held object
+                DropHeldObject(); 
             }
+
+            //generate held version of the object
+            //update bool isHolding
 
             Debug.Log("Picked up: " + currentPickup.name);
             GenerateHeldObject(currentPickup);
@@ -66,6 +87,7 @@ public class PickUp : MonoBehaviour
         PickupProperties properties = original.GetComponent<PickupProperties>();
         Vector3 pickupOffset = properties != null ? properties.pickupOffset : Vector3.zero;
         Vector3 pickupScale = properties != null ? properties.pickupScale : Vector3.one;
+        isHolding = true;
 
         // Instantiate new object (NOT parented yet!)
         GameObject newHeldObject = Instantiate(original);
@@ -76,17 +98,18 @@ public class PickUp : MonoBehaviour
         // Apply correct scale BEFORE parenting
         newHeldObject.transform.localScale = pickupScale;
 
-        Rigidbody originalRb = original.GetComponent<Rigidbody>();
-        if(originalRb != null)
+        BoxCollider[] colliders = newHeldObject.GetComponents<BoxCollider>();
+        foreach (BoxCollider col in colliders)
         {
-
+            disableBoxCollider(col);
         }
 
-        // Remove unnecessary components (Fix: Ensure newHeldObject is referenced properly)
-        if (newHeldObject.GetComponent<Rigidbody>())
-            Destroy(newHeldObject.GetComponent<Rigidbody>());
-        if (newHeldObject.GetComponent<Collider>())
-            Destroy(newHeldObject.GetComponent<Collider>());
+        Rigidbody rb = newHeldObject.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.isKinematic = true;  // Disables physics
+            rb.useGravity = false;  // Prevents falling
+        }
 
         // Set as a child of the player AFTER setting scale & position
         newHeldObject.transform.SetParent(player);
@@ -109,20 +132,42 @@ public class PickUp : MonoBehaviour
             heldObject.transform.SetParent(null);
 
             // Add Rigidbody and Collider back so it falls naturally
-            Rigidbody rb = heldObject.AddComponent<Rigidbody>();
-            rb.interpolation = RigidbodyInterpolation.Interpolate;
-            rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+            Rigidbody rb = heldObject.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.isKinematic = false; // Re-enables physics
+                rb.useGravity = true; // Allows it to fall
+            }
 
-            PickupProperties properties = heldObject.GetComponent<PickupProperties>();
-            BoxCollider col = heldObject.AddComponent<BoxCollider>(); // Assuming a BoxCollider, modify if needed
-            BoxCollider colTrigger = heldObject.AddComponent<BoxCollider>();
-            colTrigger.isTrigger = true;
-            colTrigger.size = col.size * properties.colTriggerScale;
-            colTrigger.center = col.center;
+            BoxCollider[] colliders = heldObject.GetComponents<BoxCollider>();
+            foreach (BoxCollider col in colliders)
+            {
+                enableBoxCollider(col);
+            }
 
             // Reset the reference BEFORE picking up the new object
             heldObject = null;
+            isHolding = false;
         }
     }
+
+    void disableBoxCollider(BoxCollider col)
+    {
+        if (col != null)
+        {
+            col.enabled = false;
+        }
+    }
+
+    void enableBoxCollider(BoxCollider col)
+    {
+        if (col != null)
+        {
+            col.enabled = true;
+        }
+    }
+    
+
+    
 }
 
