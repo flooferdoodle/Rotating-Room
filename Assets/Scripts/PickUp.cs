@@ -21,7 +21,7 @@ public class PickUp : MonoBehaviour
     {
         if (other.CompareTag("Pickup"))
         {
-            currentPickup = other.gameObject;
+            currentPickup = other.transform.parent.gameObject;
             Debug.Log("Entered pickup zone: " + currentPickup.name);
         }
     }
@@ -29,7 +29,7 @@ public class PickUp : MonoBehaviour
     //throws debug & updates current pickup
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject == currentPickup)
+        if (other.transform.parent!=null && other.transform.parent == currentPickup)
         {
             Debug.Log("Left pickup zone: " + currentPickup.name);
             currentPickup = null;
@@ -98,10 +98,10 @@ public class PickUp : MonoBehaviour
         // Apply correct scale BEFORE parenting
         newHeldObject.transform.localScale = pickupScale;
 
-        BoxCollider[] colliders = newHeldObject.GetComponents<BoxCollider>();
-        foreach (BoxCollider col in colliders)
+        Collider[] colliders = newHeldObject.GetComponentsInChildren<Collider>();
+        foreach (Collider col in colliders)
         {
-            disableBoxCollider(col);
+            disableCollider(col);
         }
 
         Rigidbody rb = newHeldObject.GetComponent<Rigidbody>();
@@ -139,10 +139,10 @@ public class PickUp : MonoBehaviour
                 rb.useGravity = true; // Allows it to fall
             }
 
-            BoxCollider[] colliders = heldObject.GetComponents<BoxCollider>();
-            foreach (BoxCollider col in colliders)
+            Collider[] colliders = heldObject.GetComponentsInChildren<Collider>();
+            foreach (Collider col in colliders)
             {
-                enableBoxCollider(col);
+                enableCollider(col);
             }
 
             // Reset the reference BEFORE picking up the new object
@@ -151,7 +151,7 @@ public class PickUp : MonoBehaviour
         }
     }
 
-    void disableBoxCollider(BoxCollider col)
+    void disableCollider(Collider col)
     {
         if (col != null)
         {
@@ -159,7 +159,7 @@ public class PickUp : MonoBehaviour
         }
     }
 
-    void enableBoxCollider(BoxCollider col)
+    void enableCollider(Collider col)
     {
         if (col != null)
         {
