@@ -9,6 +9,15 @@ public class Interactable : MonoBehaviour
     public bool oneTimeUse = false;
     private bool isUsed = false;
 
+    public CutsceneManager cutsceneManager;
+    public Sprite[] cutsceneImages; // Cutscene images to play
+    public bool autoPlay = false; // Should this cutscene autoplay?
+
+    private void Start()
+    {
+        cutsceneManager = FindObjectOfType<CutsceneManager>(); // Find Cutscene Manager in the scene
+    }
+
     public virtual void Interact(GameObject player)
     {
         if (oneTimeUse && isUsed) return;
@@ -30,5 +39,12 @@ public class Interactable : MonoBehaviour
     protected virtual void PerformInteraction()
     {
         Debug.Log("Interacted with " + gameObject.name);
+        Debug.Log("cut tscenes length" + cutsceneImages.Length);
+        Debug.Log("cut tscenes manager" + cutsceneManager != null);
+        if (cutsceneManager != null && cutsceneImages.Length > 0)
+        {
+            cutsceneManager.StartCutscene(cutsceneImages, autoPlay);
+        }
+
     }
 }

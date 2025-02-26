@@ -8,6 +8,10 @@ public class PosterInteract : Interactable
     {
         Debug.Log("Interact with Poster");
 
-        //Open UI and handle still interactions then close 
+        //Open UI and handle still interactions then close
+        if (cutsceneManager != null && cutsceneImages.Length > 0)
+        {
+            cutsceneManager.StartCutscene(cutsceneImages, autoPlay);
+        }
     }
 }
