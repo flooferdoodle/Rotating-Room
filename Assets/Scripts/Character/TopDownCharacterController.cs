@@ -15,37 +15,36 @@ public class TopDownCharacterController : MonoBehaviour
     // Left arrow: moves diagonally (-1, 0, 1)
     // Right arrow: moves diagonally (1, 0, -1)
     private Vector3 upDirection = new Vector3(1, 1, 0).normalized;
-    private Vector3 downDirection = new Vector3(-1, -1, 0).normalized;
-    private Vector3 leftDirection = new Vector3(-1, 1, 0).normalized;
     private Vector3 rightDirection = new Vector3(1, -1, 0).normalized;
 
     // Using FixedUpdate for smooth physics-based movement
     void FixedUpdate()
     {
-        Vector3 moveDir = Vector3.zero;
+        Vector2 moveDir = Vector2.zero;
 
-        if (Input.GetKey(KeyCode.UpArrow))
+        if (Input.GetKey(KeyCode.W))
         {
-            moveDir += upDirection * verticalMoveScale;
+            moveDir += Vector2.up;
         }
-        if (Input.GetKey(KeyCode.DownArrow))
+        if (Input.GetKey(KeyCode.S))
         {
-            moveDir += downDirection * verticalMoveScale;
+            moveDir += Vector2.down;
         }
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if (Input.GetKey(KeyCode.A))
         {
-            moveDir += leftDirection;
+            moveDir += Vector2.left;
         }
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKey(KeyCode.D))
         {
-            moveDir += rightDirection;
+            moveDir += Vector2.right;
         }
 
         // Only move if a key is pressed
-        if (moveDir != Vector3.zero)
+        if (moveDir != Vector2.zero)
         {
             moveDir.Normalize();
-            transform.position += moveDir * moveSpeed * Time.deltaTime;
+            Vector3 movement = moveDir.x * rightDirection + moveDir.y * upDirection * verticalMoveScale;
+            transform.position += movement * moveSpeed * Time.deltaTime;
         }
     }
 }

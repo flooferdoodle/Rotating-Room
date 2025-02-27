@@ -5,6 +5,7 @@ using UnityEngine;
 public class SplitHandlerSingleton : MonoBehaviour
 {
     // Singleton Setup
+    #region Singleton
     private static SplitHandlerSingleton _instance;
     public static SplitHandlerSingleton Instance { get { return _instance; } }
 
@@ -18,21 +19,15 @@ public class SplitHandlerSingleton : MonoBehaviour
             _instance = this;
         }
     }
+    #endregion
 
-
-    public int numRegions = 3;
-    public List<Texture> wallTextures;
-    public List<Texture> floorTextures;
-
-
-    public Transform roomParents;
+    public float _angle;
+    public float GetAngle() { return _angle % 360f; }
 
     public struct RoomMaterialData {
         // Underlying texture data for swapping
-        Texture wallTex;
-        Texture floorTex;
-        // Shadergraph which is basis of all objects, for changing angle offsets to handle transparency
-        Shader objectShaderBase; 
+        Material floorMatBase;
+        Material objectMatBase;
     }
 
     public List<RoomMaterialData> roomsMaterialData;
@@ -46,6 +41,7 @@ public class SplitHandlerSingleton : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        Vector3 splitLine = new Vector3(Mathf.Cos(_angle), Mathf.Sin(_angle), 0f);
+        Debug.DrawRay(Vector3.zero, splitLine * 10f, Color.cyan);
     }
 }
