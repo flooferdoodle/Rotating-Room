@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class CutsceneManager : MonoBehaviour
 {
+    public GameObject background;
     public GameObject cutscenePanel; // UI Panel to hold images
     public Image cutsceneImage; // UI Image component to display images
     public Button nextButton;
@@ -30,15 +31,41 @@ public class CutsceneManager : MonoBehaviour
         cutsceneImages = images;
         autoPlay = shouldAutoPlay;
         currentIndex = 0;
-        cutscenePanel.SetActive(true);
+
+        // Hide UI elements until the fade-in is done
+        cutscenePanel.SetActive(false);
+        nextButton.gameObject.SetActive(false);
+        skipButton.gameObject.SetActive(false);
+        cutsceneImage.gameObject.SetActive(false);
+
         cutsceneImage.sprite = cutsceneImages[currentIndex];
-        isPlaying = true;
+
+        // Start fade-in and enable UI after it finishes
+        StartCoroutine(FadeInAndEnable());
 
         if (autoPlay)
         {
             StartCoroutine(AutoPlayCutscene());
         }
     }
+
+
+    private IEnumerator FadeInAndEnable()
+    {
+        background.SetActive(true); // Ensure background is visible before fading in
+
+        // Fade in background first
+        yield return StartCoroutine(background.GetComponent<PanelFader>().FadePanel(1f, 2f));
+
+        // Now enable UI elements after background fade-in is complete
+        cutscenePanel.SetActive(true);
+        nextButton.gameObject.SetActive(true);
+        skipButton.gameObject.SetActive(true);
+        cutsceneImage.gameObject.SetActive(true);
+
+        isPlaying = true;
+    }
+
 
     IEnumerator AutoPlayCutscene()
     {
@@ -64,7 +91,23 @@ public class CutsceneManager : MonoBehaviour
 
     public void CloseCutscene()
     {
+        StartCoroutine(FadeOutAndDisable());
+    }
+
+    private IEnumerator FadeOutAndDisable()
+    {
+        // Hide UI before fade-out starts
+        nextButton.gameObject.SetActive(false);
+        skipButton.gameObject.SetActive(false);
+        cutsceneImage.gameObject.SetActive(false);
+
+        yield return StartCoroutine(background.GetComponent<PanelFader>().FadePanel(0f, 2f));
+
+        // Disable everything AFTER the fade-out is done
         cutscenePanel.SetActive(false);
+        background.SetActive(false);
         isPlaying = false;
     }
+
+
 }
