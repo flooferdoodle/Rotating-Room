@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Pickup
   - Interactable
+  - Dial Top
+  - Dial Bot
   layers:
   - Default
   - TransparentFX
@@ -13,7 +15,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - UI_DialHalves
   - 
   - 
   - 

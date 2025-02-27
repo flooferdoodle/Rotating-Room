@@ -118,7 +118,6 @@ public class MaskColliders : MonoBehaviour
             _objectPolyColls.Add(polyCollider);
             polyCollider.SetPath(0, _objectBoxes[i].ConvertToLocalPoly(sceneObj.worldToLocalMatrix));
         }
-        Debug.Break();
     }
 
     private void ResetCollisionBoxes()
