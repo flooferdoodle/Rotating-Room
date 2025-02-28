@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class DialAngleHandler : MonoBehaviour
 {
+    /*
     public Transform dialHandTemplate;
     public Transform roomTemplate;
     public int numSplits;
@@ -79,5 +80,5 @@ public class DialAngleHandler : MonoBehaviour
             sliceMaterials[i].SetFloat("_MaxAngle", maxAngle);
             sliceMaterials[i].SetFloat("_BlendAmount", blendAmount);
         }
-    }
+    }*/
 }

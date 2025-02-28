@@ -18,21 +18,39 @@ public class DialDimensionHandler : MonoBehaviour
     public DimensionButton botDimension;
     public DimensionButton topDimension;
 
+    public List<DimensionButton> dimensionsToReset;
+
     public Color DeselectTint = new Color(0.8f, 0.8f, 0.8f);
+    public float blendAmount = 5f;
+    public float wipeDuration = 0.5f;
 
     private DimensionButton _selected = null;
     private DialControl _dialControl;
+    private float _angle;
+
+    private bool _transitioning = false;
 
     // Start is called before the first frame update
     void Start()
     {
+
+
         _dialControl = GetComponent<DialControl>();
         topHalfTex.transform.parent.GetComponent<Image>().alphaHitTestMinimumThreshold = 0.1f;
         botHalfTex.transform.parent.GetComponent<Image>().alphaHitTestMinimumThreshold = 0.1f;
 
         // Reset dial with defaults
-        if (botDimension == null) botDimension = DefaultDimension;
-        if (topDimension == null) topDimension = DefaultDimension;
+        foreach (DimensionButton db in dimensionsToReset)
+        {
+            db.dimension.SetAngle(0f, 0f);
+            db.dimension.SetBlend(blendAmount);
+        }
+
+        _angle = _dialControl.GetAngle();
+        botDimension = DefaultDimension;
+        topDimension = DefaultDimension;
+        DefaultDimension.dimension.SetAngle(_angle, 360f);
+        DefaultDimension.dimension.SetBlend(blendAmount);
 
         UpdateDialSprites();
     }
@@ -40,33 +58,145 @@ public class DialDimensionHandler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(_selected != null)
+        _angle = _dialControl.GetAngle();
+        if (_transitioning) return;
+        if (_selected != null) SelectionMode();
+        else UpdateAngles();
+    }
+
+    private void UpdateAngles()
+    {
+        UpdateDimensionAngle(topDimension);
+        UpdateDimensionAngle(botDimension);
+    }
+    private void UpdateDimensionAngle(DimensionButton dimension)
+    {
+
+        switch (dimension.dimension.state)
         {
-            // Selection mode
+            default:
+            case DimensionButton.DimensionState.None:
+            case DimensionButton.DimensionState.Full:
+            case DimensionButton.DimensionState.HalfPos:
+                dimension.dimension.SetAngle(_angle);
+                break;
+            
+            case DimensionButton.DimensionState.HalfNeg:
+                dimension.dimension.SetAngle(_angle + 180f);
+                break;
+        }
+    }
+    private void UpdateDimensionState(DimensionButton dimension, DimensionButton.DimensionState targetState, bool clockwiseWipe)
+    {
+        // Update collision instantly
+        dimension.dimension.mask.SetState(targetState);
+        dimension.dimension.SetBlend(blendAmount);
 
-            // Mouseover selected half highlights
-            topHalfTex.color = DeselectTint;
-            botHalfTex.color = DeselectTint;
-            GameObject dialHit = GetDialMouseOver();
-            if(dialHit != null)
-            {
-                dialHit.transform.GetChild(0).GetComponent<Image>().color = Color.white;
-            }
+        // Run coroutine for visual wipe
+        float targetSliceAmount = 0f;
 
-            if(Input.GetMouseButtonDown(0))
+        switch (targetState)
+        {
+            case DimensionButton.DimensionState.Full: targetSliceAmount = 360f; break;
+            case DimensionButton.DimensionState.None: targetSliceAmount = 0f; break;
+            case DimensionButton.DimensionState.HalfPos: targetSliceAmount = 180f; break;
+            case DimensionButton.DimensionState.HalfNeg: targetSliceAmount = 180f; break;
+        }
+
+        StartCoroutine(SetDimensionSliceAmount(dimension, targetSliceAmount, clockwiseWipe));
+
+        dimension.dimension.state = targetState;
+    }
+
+    private void SelectionMode()
+    {
+        // Mouseover selected half highlights
+        topHalfTex.color = DeselectTint;
+        botHalfTex.color = DeselectTint;
+        GameObject dialHit = GetDialMouseOver();
+        if (dialHit != null)
+        {
+            dialHit.transform.GetChild(0).GetComponent<Image>().color = Color.white;
+        }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            // Make selection
+            if (dialHit != null)
             {
-                // Make selection
-                if(dialHit != null)
+                bool switchTop = dialHit.CompareTag("Dial Top");
+                if((switchTop ? topDimension : botDimension) == _selected)
                 {
-                    if (dialHit.CompareTag("Dial Top")) topDimension = _selected;
-                    else botDimension = _selected;
-                    UpdateDialSprites();
+                    // selected dimension is identical, so stop
+                    ExitSelectionMode();
+                    return;
                 }
 
-                // Disable selection mode
-                ExitSelectionMode();
+                _transitioning = true;
+                // Remove existing slice
+                DimensionButton.DimensionState targetState = DimensionButton.DimensionState.None;
+                if (topDimension == botDimension)
+                {
+                    if (switchTop)
+                    {
+                        targetState = DimensionButton.DimensionState.HalfNeg;
+                        topDimension.dimension.SetAngle(_angle + 180f);
+                    }
+                    else
+                    {
+                        targetState = DimensionButton.DimensionState.HalfPos;
+                    }
+                }
+                
+                UpdateDimensionState(switchTop ? topDimension : botDimension, targetState, false);
+
+                // Add new slice
+                targetState = switchTop ? DimensionButton.DimensionState.HalfPos : DimensionButton.DimensionState.HalfNeg;
+                if (_selected == (switchTop ? botDimension : topDimension))
+                    targetState = DimensionButton.DimensionState.Full;
+                else
+                {
+                    // Reset hidden slice
+                    _selected.dimension.SetAngle(_angle + (switchTop ? 180f : 0f), 0f);
+                    _selected.dimension.SetBlend(blendAmount);
+                }
+                
+                UpdateDimensionState(_selected, targetState, true);
+
+
+                if (switchTop) topDimension = _selected;
+                else botDimension = _selected;
+                UpdateDialSprites();
             }
+
         }
+    }
+
+    // Coroutine to wipe away a segment
+    IEnumerator SetDimensionSliceAmount(DimensionButton dimension, float targetSliceAmount, bool clockwise)
+    {
+        float startAngle = dimension.dimension.GetAngle();
+        float startSlice = dimension.dimension.GetSlice();
+        float fullStep = targetSliceAmount - startSlice;
+
+        float targetAngle = clockwise ? startAngle - fullStep : startAngle;
+        float targetSlice = targetSliceAmount;
+
+
+        Debug.Log("Angle: " + startAngle + "->" + targetAngle);
+        Debug.Log("Slice: " + startSlice + "->" + targetSlice);
+
+        for (float t = 0; t <= wipeDuration; t += Time.deltaTime)
+        {
+            float scaled_t = t / wipeDuration;
+            float currAngle = Mathf.Lerp(startAngle, targetAngle, scaled_t);
+            float currSlice = Mathf.Lerp(startSlice, targetSlice, scaled_t);
+            dimension.dimension.SetAngle(currAngle, currSlice);
+            yield return null;
+        }
+        dimension.dimension.SetAngle(targetAngle, targetSlice);
+
+        ExitSelectionMode();
     }
 
     private void UpdateDialSprites()
@@ -81,6 +211,7 @@ public class DialDimensionHandler : MonoBehaviour
         _dialControl.Enable();
         topHalfTex.color = Color.white;
         botHalfTex.color = Color.white;
+        _transitioning = false;
     }
 
     private GameObject GetDialMouseOver()
@@ -112,6 +243,7 @@ public class DialDimensionHandler : MonoBehaviour
     /// <param name="dimension"></param>
     public void SelectDimension(DimensionButton dimension)
     {
+        if (_transitioning) return;
         _selected = dimension;
 
         // Disable normal dial controls

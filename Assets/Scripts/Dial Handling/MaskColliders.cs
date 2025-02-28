@@ -7,16 +7,8 @@ public class MaskColliders : MonoBehaviour
     // Parent object to all the objects in the given room
     public Transform ObjectsParent;
 
-    public enum MaskState
-    {
-        Full,
-        None,
-        HalfPos,
-        HalfNeg
-    }
-
-    public MaskState _state;
-    public void SetState(MaskState newState) { _state = newState; }
+    public DimensionButton.DimensionState _state;
+    public void SetState(DimensionButton.DimensionState newState) { _state = newState; }
 
     class QuadPoly
     {
@@ -83,6 +75,8 @@ public class MaskColliders : MonoBehaviour
     private List<Transform> _objects;
     private List<QuadPoly> _objectBoxes;
     private List<PolygonCollider2D> _objectPolyColls;
+    private float _angle;
+    public void SetAngle(float theta) { _angle = theta; }
 
     QuadPoly GetBoxCorners(BoxCollider2D box)
     {
@@ -162,19 +156,19 @@ public class MaskColliders : MonoBehaviour
         // Update positions based on angle and state
         switch (_state)
         {
-            case MaskState.Full:
+            case DimensionButton.DimensionState.Full:
                 EnableCollision();
                 ResetCollisionBoxes();
                 break;
-            case MaskState.None:
+            case DimensionButton.DimensionState.None:
                 DisableCollision();
                 break;
 
-            case MaskState.HalfPos:
+            case DimensionButton.DimensionState.HalfPos:
                 EnableCollision();
-                MaskHitboxes(true);
+                MaskHitboxes(false);
                 break;
-            case MaskState.HalfNeg:
+            case DimensionButton.DimensionState.HalfNeg:
                 EnableCollision();
                 MaskHitboxes(false);
                 break;
@@ -183,7 +177,7 @@ public class MaskColliders : MonoBehaviour
 
     private void MaskHitboxes(bool orientation)
     {
-        float theta = SplitHandlerSingleton.Instance.GetAngle();
+        float theta = _angle * Mathf.Deg2Rad;
         float a = Mathf.Sin(theta);
         float b = -Mathf.Cos(theta);
 

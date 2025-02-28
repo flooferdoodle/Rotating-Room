@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class DialControl : MonoBehaviour
 {
+    public Material testMaterialEdit;
+
     private RectTransform dialTransform;
     private float currentAngle;
     private float mouseStartAngle;
@@ -42,6 +44,8 @@ public class DialControl : MonoBehaviour
         }
 
         if (Input.GetMouseButtonUp(0)) clickedOn = false;
+
+        //testMaterialEdit.SetFloat("_AngleOffset", GetAngle());
     }
 
     private float GetMouseAngle()
