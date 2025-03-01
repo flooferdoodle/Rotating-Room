@@ -5,67 +5,93 @@ using UnityEngine.UI;
 public class CutsceneManager : MonoBehaviour
 {
     public GameObject background;
-    public GameObject cutscenePanel; // UI Panel to hold images
-    public Image cutsceneImage; // UI Image component to display images
+    public GameObject cutscenePanel;
+    public Image cutsceneImage;
     public Button nextButton;
     public Button skipButton;
 
-    public Sprite[] cutsceneImages; // Array of images for the cutscene
+    public Sprite[] cutsceneImages;
     private int currentIndex = 0;
     private bool isPlaying = false;
     public bool autoPlay = false;
-    public float autoPlayDelay = 2f; // Delay between images in autoplay mode
+    public float autoPlayDelay = 2f;
+
+    // Code input UI elements
+    public GameObject codePanel; // Panel containing input field and submit button
+    public InputField codeInputField;
+    public Button submitButton;
+    public Text feedbackText;
+
+    private string correctCode = "1775";
+    public GameObject player;
+    private Interactable thisObject;
+    private bool requiresCode;
 
     private void Start()
     {
-        // Hide UI elements initially
         cutscenePanel.SetActive(false);
+        codePanel.SetActive(false);
+
         nextButton.onClick.AddListener(NextImage);
         skipButton.onClick.AddListener(CloseCutscene);
+        submitButton.onClick.AddListener(CheckCode);
     }
 
-    public void StartCutscene(Sprite[] images, bool shouldAutoPlay)
+    public void StartCutscene(Sprite[] images, bool shouldAutoPlay, bool needsCode = false, string requiredCode = "")
     {
         if (isPlaying) return;
 
+        GameObject thisInteract = player.GetComponent<PickUp>().currentInteractable;
+        Debug.Log("current Interactable" + thisInteract);
+        thisObject = thisInteract.GetComponent<Interactable>();
+        requiresCode = thisObject.needsCode;
+
         cutsceneImages = images;
         autoPlay = shouldAutoPlay;
+        requiresCode = needsCode;
+        correctCode = requiredCode;
         currentIndex = 0;
+        Debug.Log("does it require code" + requiresCode);
 
-        // Hide UI elements until the fade-in is done
-        nextButton.gameObject.SetActive(false);
-        skipButton.gameObject.SetActive(false);
-        cutsceneImage.gameObject.SetActive(false);
+        if (!requiresCode)
+        {
+            nextButton.gameObject.SetActive(true);
+            cutsceneImage.sprite = cutsceneImages[currentIndex];
 
-        cutsceneImage.sprite = cutsceneImages[currentIndex];
+            cutscenePanel.SetActive(true);
+            background.SetActive(true);
 
-        cutscenePanel.SetActive(true);
-        background.SetActive(true);
-        // Start fade-in and enable UI after it finishes
-        StartCoroutine(FadeInAndEnable());
+            StartCoroutine(FadeInAndEnable());
+        }
 
-        if (autoPlay)
+        else
+        {
+            nextButton.gameObject.SetActive(false);
+            codePanel.SetActive(true);
+        }
+
+        if (autoPlay && !requiresCode)
         {
             StartCoroutine(AutoPlayCutscene());
         }
     }
 
-
     private IEnumerator FadeInAndEnable()
     {
-        //background.SetActive(true); // Ensure background is visible before fading in
-
-        // Fade in background first
         yield return StartCoroutine(background.GetComponent<PanelFader>().FadePanel(1f, 2f));
 
-        // Now enable UI elements after background fade-in is complete
-        nextButton.gameObject.SetActive(true);
+        nextButton.gameObject.SetActive(!requiresCode);
         skipButton.gameObject.SetActive(true);
         cutsceneImage.gameObject.SetActive(true);
 
+        // Show the code input only if required
+        if (requiresCode)
+        {
+            codePanel.SetActive(true);
+        }
+
         isPlaying = true;
     }
-
 
     IEnumerator AutoPlayCutscene()
     {
@@ -78,6 +104,8 @@ public class CutsceneManager : MonoBehaviour
 
     public void NextImage()
     {
+        if (requiresCode) return; // Prevent skipping if code is required
+
         if (currentIndex < cutsceneImages.Length - 1)
         {
             currentIndex++;
@@ -96,18 +124,31 @@ public class CutsceneManager : MonoBehaviour
 
     private IEnumerator FadeOutAndDisable()
     {
-        // Hide UI before fade-out starts
         nextButton.gameObject.SetActive(false);
         skipButton.gameObject.SetActive(false);
         cutsceneImage.gameObject.SetActive(false);
+        codePanel.SetActive(false);
 
         yield return StartCoroutine(background.GetComponent<PanelFader>().FadePanel(0f, 2f));
 
-        // Disable everything AFTER the fade-out is done
         cutscenePanel.SetActive(false);
         background.SetActive(false);
         isPlaying = false;
     }
 
-
+    private void CheckCode()
+    {
+        if (codeInputField.text == correctCode)
+        {
+            feedbackText.text = "Correct!";
+            codePanel.SetActive(false);
+            requiresCode = false;
+            nextButton.gameObject.SetActive(true); // Enable Next button once correct code is entered
+        }
+        else
+        {
+            feedbackText.text = "Incorrect Code! Try again.";
+        }
+    }
 }
+

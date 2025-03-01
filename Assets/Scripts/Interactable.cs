@@ -7,6 +7,7 @@ public class Interactable : MonoBehaviour
     public GameObject requiredItem;
     public bool needsItem = false;
     public bool oneTimeUse = false;
+    public bool needsCode =false;
     private bool isUsed = false;
 
     public CutsceneManager cutsceneManager;
@@ -16,6 +17,7 @@ public class Interactable : MonoBehaviour
     private void Start()
     {
         cutsceneManager = FindObjectOfType<CutsceneManager>(); // Find Cutscene Manager in the scene
+        Debug.Log("interactable" + needsCode);
     }
 
     public virtual void Interact(GameObject player)
