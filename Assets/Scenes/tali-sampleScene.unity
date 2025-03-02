@@ -1411,13 +1411,10 @@ MonoBehaviour:
   requiredItem: {fileID: 0}
   needsItem: 0
   oneTimeUse: 0
-  needsCode: 1
   cutsceneManager: {fileID: 1647480308}
-  cutsceneImages:
-  - {fileID: 21300000, guid: 97509d84e412e4a88a794be01ded814a, type: 3}
-  - {fileID: 21300000, guid: 1986cab901e1f49b6aaf0ac3974d9422, type: 3}
-  - {fileID: 21300000, guid: 7efcbb31172474e13844dcb3a81242f0, type: 3}
+  cutsceneImages: []
   autoPlay: 0
+  needsCode: 1
 --- !u!4 &677875027
 Transform:
   m_ObjectHideFlags: 0
@@ -2956,14 +2953,16 @@ MonoBehaviour:
   cutsceneImage: {fileID: 298065846}
   nextButton: {fileID: 1735347133}
   skipButton: {fileID: 2047871250}
-  cutsceneImages: []
-  autoPlay: 0
-  autoPlayDelay: 2
   codePanel: {fileID: 2014148936}
   codeInputField: {fileID: 67322340}
   submitButton: {fileID: 1233676784}
   feedbackText: {fileID: 554479285}
-  player: {fileID: 989880823}
+  closeButton: {fileID: 2139039112}
+  cutsceneImages: []
+  autoPlay: 0
+  requiredCode: 
+  requiresCode: 0
+  autoPlayDelay: 2
 --- !u!4 &1647480309
 Transform:
   m_ObjectHideFlags: 0
@@ -3431,6 +3430,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 476675467}
   m_LocalEulerAnglesHint: {x: 0, y: -89.919, z: 0}
+--- !u!114 &2139039112 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2002043574195735297, guid: 3bf19c713994247c082160cd60fcc455,
+    type: 3}
+  m_PrefabInstance: {fileID: 1589605125}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
