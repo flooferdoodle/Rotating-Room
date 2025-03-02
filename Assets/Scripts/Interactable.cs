@@ -14,7 +14,7 @@ public class Interactable : MonoBehaviour
     public Sprite[] cutsceneImages; // Cutscene images to play
     public bool autoPlay = false; // Should this cutscene autoplay?
     public bool needsCode = false;
-    private string neededCode = "";
+    public string neededCode = "";
 
     public GameObject spawnedObject;
 
@@ -26,6 +26,7 @@ public class Interactable : MonoBehaviour
 
     public virtual void Interact(GameObject player)
     {
+        Debug.Log("interact attempted");
         if (oneTimeUse && isUsed) return;
 
         PlayerPickup thisPickUp = player.GetComponent<PlayerPickup>();

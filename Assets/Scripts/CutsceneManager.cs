@@ -1,21 +1,27 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class CutsceneManager : MonoBehaviour
 {
+    //non code cutscene
     public GameObject background;
     public GameObject cutscenePanel;
     public Image cutsceneImage;
     public Button nextButton;
     public Button skipButton;
 
-    // Code input UI elements
-    public GameObject codePanel; // Panel containing input field and submit button
-    public InputField codeInputField;
+    //code cutscene
+    public GameObject background2;
+    public GameObject cutscenePanel2;
+    public Image cutsceneImage2;
     public Button submitButton;
-    public Text feedbackText;
     public Button closeButton;
+    public TMP_InputField codeInputField;
+    public TMP_Text feedbackText;
+    public Button nextButton2;
+    
 
     public Sprite[] cutsceneImages;
     private int currentIndex = 0;
@@ -30,9 +36,19 @@ public class CutsceneManager : MonoBehaviour
     private void Start()
     {
         cutscenePanel.SetActive(false);
-        codePanel.SetActive(false);
+        cutsceneImage.gameObject.SetActive(false);
+        nextButton.gameObject.SetActive(false);
+        skipButton.gameObject.SetActive(false);
+
+        cutscenePanel2.SetActive(false);
+        cutsceneImage2.gameObject.SetActive(false);
+        submitButton.gameObject.SetActive(false);
+        closeButton.gameObject.SetActive(false);
+        codeInputField.gameObject.SetActive(false);
+        feedbackText.gameObject.SetActive(false);
 
         nextButton.onClick.AddListener(NextImage);
+        nextButton2.onClick.AddListener(NextImage);
         skipButton.onClick.AddListener(CloseCutscene);
         submitButton.onClick.AddListener(CheckCode);
         closeButton.onClick.AddListener(CloseCutscene);
@@ -45,6 +61,7 @@ public class CutsceneManager : MonoBehaviour
             spawned.SetActive(true);
 
         }
+        
     }
 
     public void StartCutscene(Sprite[] images, bool shouldAutoPlay, bool needsCode, string neededCode, GameObject spawn)
@@ -59,17 +76,12 @@ public class CutsceneManager : MonoBehaviour
         requiredCode = neededCode;
         spawned = spawn;
         currentIndex = 0;
+        nextButton2.gameObject.SetActive(false);
 
-        Debug.Log("does it require code" + requiresCode);
+        //Debug.Log("does it require code" + requiresCode);
 
         if (!requiresCode)
         {
-            codePanel.SetActive(false);
-            //codeInputField.SetActive(false);
-            submitButton.gameObject.SetActive(false);
-            closeButton.gameObject.SetActive(false);
-
-            nextButton.gameObject.SetActive(true);
             cutsceneImage.sprite = cutsceneImages[currentIndex];
 
             cutscenePanel.SetActive(true);
@@ -80,9 +92,10 @@ public class CutsceneManager : MonoBehaviour
 
         else
         {
-            nextButton.gameObject.SetActive(false);
-            closeButton.gameObject.SetActive(true);
-            codePanel.SetActive(true);
+            cutsceneImage2.sprite = cutsceneImages[currentIndex];
+            cutscenePanel2.SetActive(true);
+            background2.SetActive(true);
+            StartCoroutine(FadeInAndEnable());
         }
 
         if (autoPlay && !requiresCode)
@@ -93,16 +106,36 @@ public class CutsceneManager : MonoBehaviour
 
     private IEnumerator FadeInAndEnable()
     {
-        yield return StartCoroutine(background.GetComponent<PanelFader>().FadePanel(1f, 2f));
+        if (!requiresCode)
+        {
+            yield return StartCoroutine(background.GetComponent<PanelFader>().FadePanel(1f, 0.5f));
+        }
+        if (requiresCode)
+        {
+            yield return StartCoroutine(background2.GetComponent<PanelFader>().FadePanel(1f, 0.5f));
 
-        nextButton.gameObject.SetActive(!requiresCode);
-        skipButton.gameObject.SetActive(true);
-        cutsceneImage.gameObject.SetActive(true);
+
+        }
+
+        if (!requiresCode)
+        {
+            nextButton.gameObject.SetActive(!requiresCode);
+            skipButton.gameObject.SetActive(true);
+            cutsceneImage.gameObject.SetActive(true);
+           
+
+
+        }
 
         // Show the code input only if required
         if (requiresCode)
         {
-            codePanel.SetActive(true);
+            cutsceneImage2.gameObject.SetActive(true);
+            submitButton.gameObject.SetActive(true);
+            closeButton.gameObject.SetActive(true);
+            codeInputField.gameObject.SetActive(true);
+            feedbackText.gameObject.SetActive(true);
+
         }
 
         isPlaying = true;
@@ -119,7 +152,7 @@ public class CutsceneManager : MonoBehaviour
 
     public void NextImage()
     {
-        if (requiresCode) return; // Prevent skipping if code is required
+        //if (requiresCode) return; // Prevent skipping if code is required
 
         if (currentIndex < cutsceneImages.Length - 1)
         {
@@ -142,13 +175,31 @@ public class CutsceneManager : MonoBehaviour
         nextButton.gameObject.SetActive(false);
         skipButton.gameObject.SetActive(false);
         cutsceneImage.gameObject.SetActive(false);
+        
 
-        codePanel.SetActive(false);
+        closeButton.gameObject.SetActive(false);
+        submitButton.gameObject.SetActive(false);
+        nextButton2.gameObject.SetActive(false);
+        cutsceneImage2.gameObject.SetActive(false);
+        codeInputField.gameObject.SetActive(false);
+        feedbackText.gameObject.SetActive(false);
 
-        yield return StartCoroutine(background.GetComponent<PanelFader>().FadePanel(0f, 2f));
+
+
+
+        if (!requiresCode)
+        {
+            yield return StartCoroutine(background.GetComponent<PanelFader>().FadePanel(0f, 0.5f));
+        }
+        if (requiresCode)
+        {
+            yield return StartCoroutine(background2.GetComponent<PanelFader>().FadePanel(0f, 0.5f));
+        }
 
         cutscenePanel.SetActive(false);
+        cutscenePanel2.SetActive(false);
         background.SetActive(false);
+        background2.SetActive(false);
         isPlaying = false;
     }
 
@@ -157,9 +208,9 @@ public class CutsceneManager : MonoBehaviour
         if (codeInputField.text == requiredCode)
         {
             feedbackText.text = "Correct!";
-            //codePanel.SetActive(false);
-            requiresCode = false;
-            nextButton.gameObject.SetActive(true); // Enable Next button once correct code is entered
+            requiresCode = true;
+            submitButton.gameObject.SetActive(false);
+            nextButton2.gameObject.SetActive(true);
         }
         else
         {

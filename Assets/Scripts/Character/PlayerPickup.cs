@@ -37,6 +37,7 @@ public class PlayerPickup : MonoBehaviour
     {
         GetClosestObject();
         if (Input.GetKeyDown(KeyCode.E) && _activeObject != null)
+            
         {
             DialDimensionHandler.Instance.ExitSelectionMode();
             if(_objectIsPickup) AttemptPickup();
@@ -147,7 +148,7 @@ public class PlayerPickup : MonoBehaviour
         {
             if (!IsObjectInActiveSlice(obj))
             {
-                // Debug.Log("Ignored for not being in active slice");
+                //Debug.Log("Ignored for not being in active slice");
                 continue;
             }
 
@@ -161,7 +162,11 @@ public class PlayerPickup : MonoBehaviour
         }
         foreach(GameObject obj in _interactablesInTrigger)
         {
-            if (!IsObjectInActiveSlice(obj)) continue;
+            if (!IsObjectInActiveSlice(obj)){
+                Debug.Log("discluded from active slice");
+                continue;
+
+            }
 
             float dist = (obj.transform.position - transform.position).sqrMagnitude;
             if (dist < minDist)
@@ -182,7 +187,7 @@ public class PlayerPickup : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        //Debug.Log("Detected trigger enter");
+        
         if (other.GetComponent<PickupProperties>() == null)
         {
             //Debug.Log("Skipped object with no pickup property");
@@ -194,12 +199,14 @@ public class PlayerPickup : MonoBehaviour
         }
         else if (other.CompareTag("Interactable"))
         {
+            Debug.Log("Detected trigger enter interactable");
             _interactablesInTrigger.Add(other.gameObject);
             
         }
     }
     private void OnTriggerExit2D(Collider2D other)
     {
+
         if (other.CompareTag("Pickup"))
         {
             _pickupObjectsInTrigger.Remove(other.gameObject);
