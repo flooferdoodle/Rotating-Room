@@ -158,6 +158,10 @@ public class CutsceneManager : MonoBehaviour
         {
             currentIndex++;
             cutsceneImage.sprite = cutsceneImages[currentIndex];
+            if (requiresCode)
+            {
+                cutsceneImage2.sprite = cutsceneImages[currentIndex];
+            }
         }
         else
         {

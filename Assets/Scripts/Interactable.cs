@@ -30,7 +30,7 @@ public class Interactable : MonoBehaviour
         if (oneTimeUse && isUsed) return;
 
         PlayerPickup thisPickUp = player.GetComponent<PlayerPickup>();
-        GameObject holding = thisPickUp._currentInteractable;
+        GameObject holding = thisPickUp._heldObject;
 
 
         if (needsItem && requiredItem!=holding)
