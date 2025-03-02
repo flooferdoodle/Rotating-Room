@@ -56,7 +56,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _AlphaThreshold: 0.2
-    - _AngleOffset: 0
+    - _AngleOffset: 340.4317
     - _BlendAmount: 10
     - _OutlinePulseSpeed: 2
     - _OutlinePulseThickness: 0.7
