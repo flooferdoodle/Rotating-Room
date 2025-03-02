@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerPickup : MonoBehaviour
 {
-    private GameObject _heldObject = null;
+    public GameObject _heldObject = null;
     private GameObject _activeObject = null;
 
     public GameObject _currentInteractable = null;
