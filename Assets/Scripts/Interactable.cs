@@ -14,7 +14,9 @@ public class Interactable : MonoBehaviour
     public Sprite[] cutsceneImages; // Cutscene images to play
     public bool autoPlay = false; // Should this cutscene autoplay?
     public bool needsCode = false;
-    private string neededCode = "1775";
+    private string neededCode = "";
+
+    public GameObject spawnedObject;
 
     private void Start()
     {
@@ -26,8 +28,8 @@ public class Interactable : MonoBehaviour
     {
         if (oneTimeUse && isUsed) return;
 
-        PickUp thisPickUp = player.GetComponent<PickUp>();
-        GameObject holding = thisPickUp.heldObject;
+        PlayerPickup thisPickUp = player.GetComponent<PlayerPickup>();
+        GameObject holding = thisPickUp._currentInteractable;
 
 
         if (needsItem && requiredItem!=holding)
@@ -48,7 +50,7 @@ public class Interactable : MonoBehaviour
         if (cutsceneManager != null)
         {
             // && cutsceneImages.Length > 0
-            cutsceneManager.StartCutscene(cutsceneImages, autoPlay, needsCode, neededCode);
+            cutsceneManager.StartCutscene(cutsceneImages, autoPlay, needsCode, neededCode, spawnedObject);
         }
 
     }

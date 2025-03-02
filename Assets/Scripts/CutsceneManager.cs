@@ -25,6 +25,8 @@ public class CutsceneManager : MonoBehaviour
     public bool requiresCode = false;
     public float autoPlayDelay = 2f;
 
+    private GameObject spawned;
+
     private void Start()
     {
         cutscenePanel.SetActive(false);
@@ -36,7 +38,16 @@ public class CutsceneManager : MonoBehaviour
         closeButton.onClick.AddListener(CloseCutscene);
     }
 
-    public void StartCutscene(Sprite[] images, bool shouldAutoPlay, bool needsCode, string neededCode)
+    private void Update()
+    {
+        if(currentIndex == cutsceneImages.Length-1 && spawned!=null)
+        {
+            spawned.SetActive(true);
+
+        }
+    }
+
+    public void StartCutscene(Sprite[] images, bool shouldAutoPlay, bool needsCode, string neededCode, GameObject spawn)
     {
         if (isPlaying) return;
 
@@ -46,12 +57,18 @@ public class CutsceneManager : MonoBehaviour
         autoPlay = shouldAutoPlay;
         requiresCode = needsCode;
         requiredCode = neededCode;
+        spawned = spawn;
         currentIndex = 0;
 
         Debug.Log("does it require code" + requiresCode);
 
         if (!requiresCode)
         {
+            codePanel.SetActive(false);
+            //codeInputField.SetActive(false);
+            submitButton.gameObject.SetActive(false);
+            closeButton.gameObject.SetActive(false);
+
             nextButton.gameObject.SetActive(true);
             cutsceneImage.sprite = cutsceneImages[currentIndex];
 

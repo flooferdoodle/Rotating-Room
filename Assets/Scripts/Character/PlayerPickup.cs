@@ -6,6 +6,8 @@ public class PlayerPickup : MonoBehaviour
 {
     private GameObject _heldObject = null;
     private GameObject _activeObject = null;
+
+    public GameObject _currentInteractable = null;
     private bool _objectIsPickup = false;
 
     public SpriteRenderer heldObjectRenderer;
@@ -38,6 +40,13 @@ public class PlayerPickup : MonoBehaviour
         {
             DialDimensionHandler.Instance.ExitSelectionMode();
             if(_objectIsPickup) AttemptPickup();
+            else
+            {
+                Interactable thisInteractable = _activeObject.GetComponent<Interactable>();
+                _currentInteractable = _activeObject;
+                thisInteractable.Interact(gameObject);
+              
+            }
         }
 
         //Debug.Log("Active: " + ((_activeObject != null) ? _activeObject.name : "null"));
@@ -186,6 +195,7 @@ public class PlayerPickup : MonoBehaviour
         else if (other.CompareTag("Interactable"))
         {
             _interactablesInTrigger.Add(other.gameObject);
+            
         }
     }
     private void OnTriggerExit2D(Collider2D other)

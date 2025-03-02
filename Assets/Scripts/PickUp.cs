@@ -29,7 +29,7 @@ public class PickUp : MonoBehaviour
 
         if (other.CompareTag("Interactable"))
         {
-            currentInteractable = other.transform.parent.gameObject;
+            currentInteractable = other.transform.gameObject;
             Debug.Log("Entered interact zone: " + currentInteractable.name);
         }
     }
