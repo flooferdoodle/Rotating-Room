@@ -1051,7 +1051,7 @@ PrefabInstance:
     - target: {fileID: 8441598564391941604, guid: 3bf19c713994247c082160cd60fcc455,
         type: 3}
       propertyPath: m_Name
-      value: cutSceneOutline (1) Variant
+      value: codeCSOutline
       objectReference: {fileID: 0}
     - target: {fileID: 8668484044562774284, guid: 3bf19c713994247c082160cd60fcc455,
         type: 3}
@@ -1063,7 +1063,7 @@ PrefabInstance:
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 6282410051060479872, guid: 3bf19c713994247c082160cd60fcc455,
         type: 3}
-      insertIndex: 1
+      insertIndex: 2
       addedObject: {fileID: 4509938490987359965}
     - targetCorrespondingSourceObject: {fileID: 6282410051060479872, guid: 3bf19c713994247c082160cd60fcc455,
         type: 3}
