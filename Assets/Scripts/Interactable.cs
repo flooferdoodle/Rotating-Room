@@ -7,17 +7,19 @@ public class Interactable : MonoBehaviour
     public GameObject requiredItem;
     public bool needsItem = false;
     public bool oneTimeUse = false;
-    public bool needsCode =false;
+
     private bool isUsed = false;
 
     public CutsceneManager cutsceneManager;
     public Sprite[] cutsceneImages; // Cutscene images to play
     public bool autoPlay = false; // Should this cutscene autoplay?
+    public bool needsCode = false;
+    private string neededCode = "1775";
 
     private void Start()
     {
-        cutsceneManager = FindObjectOfType<CutsceneManager>(); // Find Cutscene Manager in the scene
-        Debug.Log("interactable" + needsCode);
+        cutsceneManager = FindObjectOfType<CutsceneManager>();
+        //Debug.Log("interactable" + needsCode);
     }
 
     public virtual void Interact(GameObject player)
@@ -41,11 +43,12 @@ public class Interactable : MonoBehaviour
     protected virtual void PerformInteraction()
     {
         Debug.Log("Interacted with " + gameObject.name);
-        Debug.Log("cut tscenes length" + cutsceneImages.Length);
-        Debug.Log("cut tscenes manager" + cutsceneManager != null);
-        if (cutsceneManager != null && cutsceneImages.Length > 0)
+        Debug.Log("cut scenes length" + cutsceneImages.Length);
+        Debug.Log("cutt scenes manager" + cutsceneManager != null);
+        if (cutsceneManager != null)
         {
-            cutsceneManager.StartCutscene(cutsceneImages, autoPlay);
+            // && cutsceneImages.Length > 0
+            cutsceneManager.StartCutscene(cutsceneImages, autoPlay, needsCode, neededCode);
         }
 
     }

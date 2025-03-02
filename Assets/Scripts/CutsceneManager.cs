@@ -10,22 +10,20 @@ public class CutsceneManager : MonoBehaviour
     public Button nextButton;
     public Button skipButton;
 
-    public Sprite[] cutsceneImages;
-    private int currentIndex = 0;
-    private bool isPlaying = false;
-    public bool autoPlay = false;
-    public float autoPlayDelay = 2f;
-
     // Code input UI elements
     public GameObject codePanel; // Panel containing input field and submit button
     public InputField codeInputField;
     public Button submitButton;
     public Text feedbackText;
+    public Button closeButton;
 
-    private string correctCode = "1775";
-    public GameObject player;
-    private Interactable thisObject;
-    private bool requiresCode;
+    public Sprite[] cutsceneImages;
+    private int currentIndex = 0;
+    private bool isPlaying = false;
+    public bool autoPlay = false;
+    public string requiredCode = "false";
+    public bool requiresCode = false;
+    public float autoPlayDelay = 2f;
 
     private void Start()
     {
@@ -35,22 +33,21 @@ public class CutsceneManager : MonoBehaviour
         nextButton.onClick.AddListener(NextImage);
         skipButton.onClick.AddListener(CloseCutscene);
         submitButton.onClick.AddListener(CheckCode);
+        closeButton.onClick.AddListener(CloseCutscene);
     }
 
-    public void StartCutscene(Sprite[] images, bool shouldAutoPlay, bool needsCode = false, string requiredCode = "")
+    public void StartCutscene(Sprite[] images, bool shouldAutoPlay, bool needsCode, string neededCode)
     {
         if (isPlaying) return;
 
-        GameObject thisInteract = player.GetComponent<PickUp>().currentInteractable;
-        Debug.Log("current Interactable" + thisInteract);
-        thisObject = thisInteract.GetComponent<Interactable>();
-        requiresCode = thisObject.needsCode;
+        
 
         cutsceneImages = images;
         autoPlay = shouldAutoPlay;
         requiresCode = needsCode;
-        correctCode = requiredCode;
+        requiredCode = neededCode;
         currentIndex = 0;
+
         Debug.Log("does it require code" + requiresCode);
 
         if (!requiresCode)
@@ -67,6 +64,7 @@ public class CutsceneManager : MonoBehaviour
         else
         {
             nextButton.gameObject.SetActive(false);
+            closeButton.gameObject.SetActive(true);
             codePanel.SetActive(true);
         }
 
@@ -127,6 +125,7 @@ public class CutsceneManager : MonoBehaviour
         nextButton.gameObject.SetActive(false);
         skipButton.gameObject.SetActive(false);
         cutsceneImage.gameObject.SetActive(false);
+
         codePanel.SetActive(false);
 
         yield return StartCoroutine(background.GetComponent<PanelFader>().FadePanel(0f, 2f));
@@ -138,10 +137,10 @@ public class CutsceneManager : MonoBehaviour
 
     private void CheckCode()
     {
-        if (codeInputField.text == correctCode)
+        if (codeInputField.text == requiredCode)
         {
             feedbackText.text = "Correct!";
-            codePanel.SetActive(false);
+            //codePanel.SetActive(false);
             requiresCode = false;
             nextButton.gameObject.SetActive(true); // Enable Next button once correct code is entered
         }
