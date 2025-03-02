@@ -29,6 +29,7 @@ public class DialControl : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
+            TopDownCharacterController.Instance.UseDial();
             if ((Input.mousePosition - transform.position).sqrMagnitude < DetectionRadius * DetectionRadius)
             {
                 currentAngle = dialTransform.localEulerAngles[2];

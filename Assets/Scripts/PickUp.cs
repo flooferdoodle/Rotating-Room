@@ -102,7 +102,7 @@ public class PickUp : MonoBehaviour
         // Get unique offset and scale from PickupProperties
         PickupProperties properties = original.GetComponent<PickupProperties>();
         Vector3 pickupOffset = properties != null ? properties.pickupOffset : Vector3.zero;
-        Vector3 pickupScale = properties != null ? properties.pickupScale : Vector3.one;
+        Vector3 pickupScale = properties != null ? new Vector3(properties.pickupScale, properties.pickupScale, properties.pickupScale) : Vector3.one;
         isHolding = true;
 
         // Instantiate new object (NOT parented yet!)

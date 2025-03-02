@@ -7,6 +7,24 @@ using UnityEngine.EventSystems;
 [RequireComponent(typeof(DialControl))]
 public class DialDimensionHandler : MonoBehaviour
 {
+    // Singleton Setup
+    #region Singleton
+    private static DialDimensionHandler _instance;
+    public static DialDimensionHandler Instance { get { return _instance; } }
+
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            _instance = this;
+        }
+    }
+    #endregion
+
     public GraphicRaycaster m_Raycaster;
     PointerEventData m_PointerEventData;
     public EventSystem m_EventSystem;
@@ -18,7 +36,7 @@ public class DialDimensionHandler : MonoBehaviour
     public DimensionButton botDimension;
     public DimensionButton topDimension;
 
-    public List<DimensionButton> dimensionsToReset;
+    public List<DimensionButton> dimensionsList;
 
     public Color DeselectTint = new Color(0.8f, 0.8f, 0.8f);
     public float blendAmount = 5f;
@@ -40,7 +58,7 @@ public class DialDimensionHandler : MonoBehaviour
         botHalfTex.transform.parent.GetComponent<Image>().alphaHitTestMinimumThreshold = 0.1f;
 
         // Reset dial with defaults
-        foreach (DimensionButton db in dimensionsToReset)
+        foreach (DimensionButton db in dimensionsList)
         {
             db.dimension.SetAngle(0f, 0f);
             db.dimension.SetBlend(blendAmount);
@@ -55,6 +73,7 @@ public class DialDimensionHandler : MonoBehaviour
         UpdateDialSprites();
     }
 
+
     // Update is called once per frame
     void Update()
     {
@@ -62,6 +81,27 @@ public class DialDimensionHandler : MonoBehaviour
         if (_transitioning) return;
         if (_selected != null) SelectionMode();
         else UpdateAngles();
+    }
+
+    public static bool IsPosInDimension(Vector2 pos, DimensionButton.Dimension dim)
+    {
+        float objAngle = Mathf.Atan2(pos.y, pos.x) * Mathf.Rad2Deg;
+
+        float angle = dim.GetAngle();
+        float slice = dim.GetSlice();
+
+        objAngle -= angle;
+        objAngle = (objAngle % 360f + 360f) % 360f;
+
+        return !(objAngle > slice);
+    }
+
+    public DimensionButton GetDimensionForPosition(Vector2 pos)
+    {
+        if (topDimension.dimension == botDimension.dimension) return topDimension;
+
+        if (IsPosInDimension(pos, topDimension.dimension)) return topDimension;
+        return botDimension;
     }
 
     private void UpdateAngles()
@@ -205,7 +245,7 @@ public class DialDimensionHandler : MonoBehaviour
         botHalfTex.sprite = botDimension.dimension.dialSprite;
     }
 
-    private void ExitSelectionMode()
+    public void ExitSelectionMode()
     {
         _selected = null;
         _dialControl.Enable();

@@ -15,6 +15,8 @@ public class DimensionButton : MonoBehaviour
     [System.Serializable]
     public class Dimension
     {
+        public Transform DimensionRoom;
+
         public Material floorMatBase;
         public Material objectMatBase;
 

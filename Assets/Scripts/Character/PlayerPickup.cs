@@ -7,7 +7,6 @@ public class PlayerPickup : MonoBehaviour
     private GameObject _heldObject = null;
     private GameObject _activeObject = null;
     private bool _objectIsPickup = false;
-    public float DefaultPickupItemRescale = 15f;
 
     public SpriteRenderer heldObjectRenderer;
     public Material SelectionEffectMaterial;
@@ -37,7 +36,15 @@ public class PlayerPickup : MonoBehaviour
         GetClosestObject();
         if (Input.GetKeyDown(KeyCode.E) && _activeObject != null)
         {
+            DialDimensionHandler.Instance.ExitSelectionMode();
             if(_objectIsPickup) AttemptPickup();
+        }
+
+        //Debug.Log("Active: " + ((_activeObject != null) ? _activeObject.name : "null"));
+
+        if(_heldObject != null)
+        {
+            //Debug.Log("Holding " + _heldObject.name);
         }
     }
 
@@ -45,13 +52,36 @@ public class PlayerPickup : MonoBehaviour
     {
         if (_heldObject != null)
         {
+            Vector2 droppedPos = heldObjectRenderer.transform.position;
+
             // Drop object at current location
             _heldObject.transform.position = new Vector3(
-                heldObjectRenderer.transform.position.x, heldObjectRenderer.transform.position.y, _heldObject.transform.position.z
+                droppedPos.x, droppedPos.y, _heldObject.transform.position.z
             );
 
             // Remove sprite
             heldObjectRenderer.sprite = null;
+
+
+            // Move object to new dimension (if necessary)
+            DimensionButton newDim = DialDimensionHandler.Instance.GetDimensionForPosition(droppedPos);
+            if (_heldObject.GetComponent<PickupProperties>().dimensionOfOrigin.dimension != newDim.dimension)
+            {
+                // Debug.Log("Swapped held object dimension to " + newDim.dimension.DimensionRoom.name);
+                // Remove object from current MaskColliders
+                _heldObject.GetComponentInParent<MaskColliders>().RemoveObject(_heldObject);
+
+                // Add object to new dimension and MaskColliders
+                Transform newDimObjects = newDim.dimension.DimensionRoom.Find("Objects");
+                _heldObject.transform.parent = newDimObjects;
+                newDimObjects.GetComponent<MaskColliders>().AddObject(_heldObject);
+
+                // Set material to new dimension material
+                _heldObject.GetComponentInChildren<SpriteRenderer>().sharedMaterial = newDim.dimension.objectMatBase;
+
+                _heldObject.GetComponent<PickupProperties>().dimensionOfOrigin = newDim;
+            }
+
 
             // Re-enable object
             _heldObject.SetActive(true);
@@ -69,8 +99,15 @@ public class PlayerPickup : MonoBehaviour
         GetClosestObject();
         heldObjectRenderer.sprite = _heldObject.GetComponentInChildren<SpriteRenderer>().sprite;
 
+        // Update held item sprite
+        PickupProperties properties = _activeObject.GetComponent<PickupProperties>();
+        heldObjectRenderer.transform.localPosition = properties.pickupOffset;
+        heldObjectRenderer.transform.localScale = new Vector3(properties.pickupScale, properties.pickupScale, properties.pickupScale);
+
+        // Disable original object
         _heldObject.SetActive(false);
     }
+
 
     private bool IsObjectInActiveSlice(GameObject obj)
     {
@@ -81,11 +118,9 @@ public class PlayerPickup : MonoBehaviour
             return true; // default to allowing object selection
         }
         Vector2 objCenter = box.GetCenter();
-        Material spriteShader = obj.GetComponentInChildren<SpriteRenderer>().sharedMaterial;
-        float angle = spriteShader.GetFloat("_AngleOffset");
-        // TODO: Change from accessing the shader to accessing the Dimension from DimensionButton instance that this object is in
 
-        return false;
+
+        return DialDimensionHandler.IsPosInDimension(objCenter, obj.GetComponent<PickupProperties>().dimensionOfOrigin.dimension);
     }
 
     private void GetClosestObject()
@@ -101,6 +136,12 @@ public class PlayerPickup : MonoBehaviour
         // TODO: Exclude objects who's collider midpoints are outside of the dimension
         foreach(GameObject obj in _pickupObjectsInTrigger)
         {
+            if (!IsObjectInActiveSlice(obj))
+            {
+                // Debug.Log("Ignored for not being in active slice");
+                continue;
+            }
+
             float dist = (obj.transform.position - transform.position).sqrMagnitude;
             if(dist < minDist)
             {
@@ -111,6 +152,8 @@ public class PlayerPickup : MonoBehaviour
         }
         foreach(GameObject obj in _interactablesInTrigger)
         {
+            if (!IsObjectInActiveSlice(obj)) continue;
+
             float dist = (obj.transform.position - transform.position).sqrMagnitude;
             if (dist < minDist)
             {
@@ -130,6 +173,12 @@ public class PlayerPickup : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        //Debug.Log("Detected trigger enter");
+        if (other.GetComponent<PickupProperties>() == null)
+        {
+            //Debug.Log("Skipped object with no pickup property");
+            return;
+        }
         if (other.CompareTag("Pickup"))
         {
             _pickupObjectsInTrigger.Add(other.gameObject);

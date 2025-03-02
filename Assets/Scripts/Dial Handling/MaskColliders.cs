@@ -161,7 +161,31 @@ public class MaskColliders : MonoBehaviour
         }
     }
 
-    
+    public bool RemoveObject(GameObject obj)
+    {
+        int i = _objects.IndexOf(obj.transform);
+        if (i == -1) return false;
+
+        _objects.RemoveAt(i);
+        _objectBoxes.RemoveAt(i);
+        _objectPolyColls.RemoveAt(i);
+
+        return true;
+    }
+
+    public void AddObject(GameObject obj)
+    {
+        _objects.Add(obj.transform);
+
+        BoxCollider2D boxColl = obj.GetComponent<BoxCollider2D>();
+        _objectBoxes.Add(GetBoxCorners(boxColl));
+
+        // Replace collider with polygon
+        boxColl.enabled = false;
+        PolygonCollider2D polyCollider = obj.GetComponent<PolygonCollider2D>();
+        _objectPolyColls.Add(polyCollider);
+        polyCollider.SetPath(0, _objectBoxes[^1].ConvertToLocalPoly(obj.transform.worldToLocalMatrix));
+    }
 
     private void UpdateBaseHitboxes()
     {
