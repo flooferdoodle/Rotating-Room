@@ -69,6 +69,8 @@ public class DialDimensionHandler : MonoBehaviour
         topDimension = DefaultDimension;
         DefaultDimension.dimension.SetAngle(_angle, 360f);
         DefaultDimension.dimension.SetBlend(blendAmount);
+        MusicHandler.Instance.PlayDimensionTrack(DefaultDimension, true);
+        MusicHandler.Instance.PlayDimensionTrack(DefaultDimension, false);
 
         UpdateDialSprites();
     }
@@ -171,6 +173,9 @@ public class DialDimensionHandler : MonoBehaviour
                     ExitSelectionMode();
                     return;
                 }
+
+                // Update music
+                MusicHandler.Instance.PlayDimensionTrack(_selected, switchTop);
 
                 _transitioning = true;
                 // Remove existing slice
