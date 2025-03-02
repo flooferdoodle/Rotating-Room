@@ -46,7 +46,7 @@ Material:
     - _BlendAmount: 10
     - _QueueControl: 0
     - _QueueOffset: -16
-    - _SliceAngle: 360
+    - _SliceAngle: 0
     m_Colors: []
   m_BuildTextureStacks: []
 --- !u!114 &4064876950416469615
