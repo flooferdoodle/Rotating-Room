@@ -42,11 +42,11 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AngleOffset: 11.2846985
+    - _AngleOffset: 0
     - _BlendAmount: 10
     - _QueueControl: 0
     - _QueueOffset: -16
-    - _SliceAngle: 300
+    - _SliceAngle: 360
     m_Colors: []
   m_BuildTextureStacks: []
 --- !u!114 &4064876950416469615

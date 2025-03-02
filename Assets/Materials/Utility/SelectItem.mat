@@ -56,12 +56,12 @@ Material:
     m_Ints: []
     m_Floats:
     - _AlphaThreshold: 0.2
-    - _AngleOffset: 340.4317
+    - _AngleOffset: 223.8958
     - _BlendAmount: 10
     - _OutlinePulseSpeed: 2
     - _OutlinePulseThickness: 0.7
     - _OutlineThickness: 2
-    - _SliceAngle: 360
+    - _SliceAngle: 180
     m_Colors:
     - _OutlineColor: {r: 1, g: 0.7660353, b: 0, a: 0}
   m_BuildTextureStacks: []
