@@ -2,23 +2,44 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(PlayerPickup))]
 public class TopDownCharacterController : MonoBehaviour
 {
+    // Singleton Setup
+    #region Singleton
+    private static TopDownCharacterController _instance;
+    public static TopDownCharacterController Instance { get { return _instance; } }
+
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            _instance = this;
+        }
+    }
+    #endregion
+
     // Movement speed in units per second
     public float moveSpeed = 5f;
     public float verticalMoveScale = 0.5f;
 
+    private PlayerPickup _playerPickup;
+    public bool DialInUse = false;
+
+    private void Start()
+    {
+        _playerPickup = GetComponent<PlayerPickup>();
+    }
+
     // Pre-calculated directional vectors for a typical isometric view.
-    // Adjust these if your camera rotation differs.
-    // Up arrow: moves diagonally (1, 0, 1)
-    // Down arrow: moves diagonally (-1, 0, -1)
-    // Left arrow: moves diagonally (-1, 0, 1)
-    // Right arrow: moves diagonally (1, 0, -1)
     private Vector3 upDirection = new Vector3(1, 1, 0).normalized;
     private Vector3 rightDirection = new Vector3(1, -1, 0).normalized;
 
-    // Using FixedUpdate for smooth physics-based movement
-    void FixedUpdate()
+    void Update()
     {
         Vector2 moveDir = Vector2.zero;
 
@@ -46,5 +67,11 @@ public class TopDownCharacterController : MonoBehaviour
             Vector3 movement = moveDir.x * rightDirection + moveDir.y * upDirection * verticalMoveScale;
             transform.position += movement * moveSpeed * Time.deltaTime;
         }
+    }
+
+    public void UseDial()
+    {
+        // Using dial prevents pickup, so force player to drop item
+        _playerPickup.DropCurrentObject();
     }
 }

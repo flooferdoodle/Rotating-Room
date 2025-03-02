@@ -183,8 +183,8 @@ public class DialDimensionHandler : MonoBehaviour
         float targetSlice = targetSliceAmount;
 
 
-        Debug.Log("Angle: " + startAngle + "->" + targetAngle);
-        Debug.Log("Slice: " + startSlice + "->" + targetSlice);
+        //Debug.Log("Angle: " + startAngle + "->" + targetAngle);
+        //Debug.Log("Slice: " + startSlice + "->" + targetSlice);
 
         for (float t = 0; t <= wipeDuration; t += Time.deltaTime)
         {
@@ -243,6 +243,7 @@ public class DialDimensionHandler : MonoBehaviour
     /// <param name="dimension"></param>
     public void SelectDimension(DimensionButton dimension)
     {
+        TopDownCharacterController.Instance.UseDial();
         if (_transitioning) return;
         _selected = dimension;
 

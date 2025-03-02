@@ -39,6 +39,7 @@ public class DialControl : MonoBehaviour
 
         if (Input.GetMouseButton(0) && clickedOn) // Detect mouse drag
         {
+            TopDownCharacterController.Instance.UseDial();
             float mouseAngle = GetMouseAngle();
             dialTransform.localRotation = Quaternion.Euler(0, 0, mouseAngle - mouseStartAngle + currentAngle);
         }

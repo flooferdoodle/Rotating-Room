@@ -10,7 +10,7 @@ public class MaskColliders : MonoBehaviour
     public DimensionButton.DimensionState _state;
     public void SetState(DimensionButton.DimensionState newState) { _state = newState; }
 
-    class QuadPoly
+    public class QuadPoly
     {
         // Clockwise oriented points
         public Vector2[] pts;
@@ -34,6 +34,42 @@ public class MaskColliders : MonoBehaviour
             {
                 pts[i] = points[i];
             }
+        }
+
+        Vector2[] GetBoxColliderCorners(BoxCollider2D box)
+        {
+            Transform t = box.transform;
+            Vector2 offset = box.offset;
+            Vector2 size = box.size * 0.5f; // Half extents
+
+            // Define local-space corners
+            Vector2[] localCorners = new Vector2[]
+            {
+                new Vector2(-size.x, size.y) + offset,  // Top Left
+                new Vector2(size.x, size.y) + offset,   // Top Right
+                new Vector2(size.x, -size.y) + offset,  // Bottom Right
+                new Vector2(-size.x, -size.y) + offset  // Bottom Left
+            };
+
+            // Transform to world space
+            for (int i = 0; i < localCorners.Length; i++)
+            {
+                localCorners[i] = t.localToWorldMatrix.MultiplyPoint3x4(localCorners[i]);
+            }
+
+            return localCorners;
+        }
+
+
+        public void UpdateCorners(BoxCollider2D box)
+        {
+            Vector2[] newCorners = GetBoxColliderCorners(box);
+
+            pts[0] = newCorners[0]; // Top-left
+            pts[1] = newCorners[1]; // Top-right
+            pts[2] = newCorners[2]; // Bottom-right
+            pts[3] = newCorners[3]; // Bottom-left
+            
         }
 
         public Vector2[] ConvertToLocalPoly(Matrix4x4 worldToLocal)
@@ -78,6 +114,17 @@ public class MaskColliders : MonoBehaviour
     private float _angle;
     public void SetAngle(float theta) { _angle = theta; }
 
+
+    public QuadPoly FindGameobjectHitBox(GameObject obj)
+    {
+        int i = _objects.IndexOf(obj.transform);
+        if(i == -1)
+        {
+            Debug.Log("Failed to locate " + obj.name + " in " + obj.transform.parent.parent.name);
+            return null;
+        }
+        return _objectBoxes[i];
+    }
     QuadPoly GetBoxCorners(BoxCollider2D box)
     {
         Bounds bounds = box.bounds;
@@ -111,6 +158,16 @@ public class MaskColliders : MonoBehaviour
             PolygonCollider2D polyCollider = boxColl.gameObject.AddComponent<PolygonCollider2D>();
             _objectPolyColls.Add(polyCollider);
             polyCollider.SetPath(0, _objectBoxes[i].ConvertToLocalPoly(sceneObj.worldToLocalMatrix));
+        }
+    }
+
+    
+
+    private void UpdateBaseHitboxes()
+    {
+        for(int i = 0; i < _objectBoxes.Count; i++)
+        {
+            _objectBoxes[i].UpdateCorners(_objects[i].GetComponent<BoxCollider2D>());
         }
     }
 
@@ -153,6 +210,7 @@ public class MaskColliders : MonoBehaviour
 
     void FixedUpdate()
     {
+        UpdateBaseHitboxes();
         // Update positions based on angle and state
         switch (_state)
         {
