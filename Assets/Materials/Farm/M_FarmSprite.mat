@@ -55,11 +55,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-<<<<<<< Updated upstream
     - _AngleOffset: 340.4317
-=======
-    - _AngleOffset: 354.39322
->>>>>>> Stashed changes
     - _BlendAmount: 10
     - _SliceAngle: 360
     m_Colors: []
