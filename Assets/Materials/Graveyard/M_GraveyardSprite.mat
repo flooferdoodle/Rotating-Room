@@ -55,8 +55,8 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AngleOffset: 0
+    - _AngleOffset: 182.72849
     - _BlendAmount: 10
-    - _SliceAngle: 360
+    - _SliceAngle: 180
     m_Colors: []
   m_BuildTextureStacks: []

@@ -16,6 +16,8 @@ public class Interactable : MonoBehaviour
     public bool needsCode = false;
     public string neededCode = "";
 
+    public bool toDisappear =false;
+
     public GameObject spawnedObject;
 
     private void Start()
@@ -37,6 +39,11 @@ public class Interactable : MonoBehaviour
         {
             Debug.Log("You need " + requiredItem + " to interact!");
             return;
+        }
+        if (toDisappear)
+        {
+            spawnedObject.SetActive(true);
+            gameObject.SetActive(false);
         }
 
         PerformInteraction();

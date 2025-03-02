@@ -163,7 +163,7 @@ public class PlayerPickup : MonoBehaviour
         foreach(GameObject obj in _interactablesInTrigger)
         {
             if (!IsObjectInActiveSlice(obj)){
-                Debug.Log("discluded from active slice");
+                //Debug.Log("discluded from active slice");
                 continue;
 
             }
